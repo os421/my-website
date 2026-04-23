@@ -1,0 +1,15 @@
+# Audio/video files (too large for GitHub)
+*.mp3
+*.m4a
+*.mp4
+*.m4v
+*.wav
+*.aac
+
+# Transcript text files (large)
+*文字起こし*
+*transcript*
+
+# OS files
+.DS_Store
+Thumbs.db

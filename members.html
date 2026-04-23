@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>メンバー | 野心会</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #F2EEE5; --bg2: #E8E2D5; --bg3: #DDD7C8;
+      --border: #1a1a1a; --border-light: #C4B89A;
+      --text: #1a1a1a; --muted: #8B7355; --accent: #D4380D; --accent2: #B52D0A;
+      --gold: #C49A00; --radius: 4px; --shadow: 0 2px 8px rgba(0,0,0,0.10); --nav-h: 64px;
+      color-scheme: light;
+    }
+    html { scroll-behavior: smooth; color-scheme: light; font-size: 17px; }
+    body { background: var(--bg); color: var(--text); font-family: 'Hiragino Kaku Gothic ProN','Hiragino Sans','Noto Sans JP',sans-serif; font-size: 15px; line-height: 1.7; }
+    a { color: var(--text); text-decoration: none; }
+    a:hover { color: var(--accent); }
+    img { max-width: 100%; display: block; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); }
+    .fade-in { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    nav { position: fixed; top: 0; left: 0; right: 0; height: 64px; background: #F2EEE5; border-bottom: 2px solid #1a1a1a; z-index: 1000; display: flex; flex-direction: row; align-items: center; justify-content: space-between; padding: 0 40px; }
+    .nav-logo { display: flex; flex-direction: row; align-items: center; gap: 10px; font-size: 1.1rem; font-weight: 900; color: #1a1a1a; text-decoration: none; letter-spacing: 0.04em; flex-shrink: 0; }
+    .nav-logo img { width: 56px; height: 56px; object-fit: contain; }
+    .nav-links { display: flex !important; flex-direction: row !important; align-items: center; gap: 24px; list-style: none; margin: 0; padding: 0; }
+    .nav-links li { display: flex; flex-direction: row; }
+    .nav-links a { color: #1a1a1a !important; font-size: 0.68rem; letter-spacing: 0.10em; text-transform: uppercase; font-weight: 700; transition: color 0.2s; white-space: nowrap; }
+    .nav-links a:hover, .nav-links a.active { color: #D4380D !important; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: #1a1a1a; transition: all 0.3s; }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .mobile-menu { display: none; position: fixed; top: 64px; left: 0; right: 0; background: #F2EEE5; border-bottom: 2px solid #1a1a1a; padding: 20px 32px; z-index: 999; flex-direction: column; gap: 0; }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { color: #8B7355; font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 12px 0; border-bottom: 1px solid #C4B89A; }
+
+    .page-header { padding: calc(var(--nav-h) + 56px) 40px 40px; max-width: 1100px; margin: 0 auto; border-bottom: 2px solid var(--border); position: relative; }
+    .page-label { font-size: 0.6rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 8px; display: block; }
+    .page-header h1 { font-size: clamp(2.4rem, 7vw, 4.5rem); font-weight: 900; line-height: 1.05; margin-bottom: 12px; }
+    .page-header p { font-size: 0.82rem; color: var(--muted); max-width: 400px; }
+    .stamp { width: 220px; height: 220px; background-color: transparent; background-size: contain; background-repeat: no-repeat; background-position: center; position: absolute; right: 40px; top: calc(var(--nav-h) - 10px); }
+
+    .divider { height: 2px; background: var(--border); max-width: 1100px; margin: 0 auto; }
+    section { padding: 56px 40px 72px; max-width: 1100px; margin: 0 auto; }
+    .section-label { font-size: 0.6rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 6px; display: block; }
+    .section-title { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 900; line-height: 1.1; padding-bottom: 10px; border-bottom: 2px solid var(--border); display: inline-block; }
+
+    .btn { display: inline-block; padding: 10px 24px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; border-radius: var(--radius); }
+    .btn-primary { background: var(--accent); color: #fff; border: 2px solid var(--accent); }
+    .btn-primary:hover { background: var(--accent2); border-color: var(--accent2); color: #fff; text-decoration: none; }
+
+    /* Member cards */
+    .member-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: 2px solid var(--border); }
+    .member-card { padding: 32px 24px; text-align: center; border-right: 2px solid var(--border); transition: background 0.15s; }
+    .member-card:last-child { border-right: none; }
+    .member-card:hover { background: var(--bg2); }
+    .member-avatar { width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--border); overflow: hidden; margin: 0 auto 16px; background: var(--bg2); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; }
+    .member-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .member-name { font-size: 1.05rem; font-weight: 800; margin-bottom: 4px; letter-spacing: 0.02em; }
+    .member-handle { font-size: 0.62rem; letter-spacing: 0.12em; color: var(--accent); margin-bottom: 12px; }
+    .member-handle a { color: var(--accent); }
+    .member-bio { font-size: 0.75rem; color: var(--muted); margin-bottom: 14px; line-height: 1.85; }
+    .member-tags { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
+    .tag { font-size: 0.6rem; padding: 2px 8px; border: 1px solid var(--border-light); color: var(--muted); letter-spacing: 0.08em; }
+    .member-placeholder { opacity: 0.5; }
+
+    /* Profile section */
+    .profile-section { padding: 0 40px 64px; max-width: 1100px; margin: 0 auto; scroll-margin-top: 80px; }
+    .member-card.clickable { cursor: pointer; }
+    .member-card-arrow { font-size: 0.6rem; letter-spacing: 0.12em; color: var(--accent); font-weight: 700; margin-top: 12px; opacity: 0.7; }
+    .profile-block-title { font-size: 0.6rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 24px; display: block; }
+    .profile-card { border: 2px solid var(--border); margin-bottom: 16px; }
+    .profile-top { display: grid; grid-template-columns: 200px 1fr; }
+    .profile-photo-wrap { background: var(--bg2); border-right: 2px solid var(--border); display: flex; align-items: center; justify-content: center; min-height: 220px; }
+    .profile-photo-wrap img { width: 100%; height: 220px; object-fit: cover; display: block; }
+    .profile-intro { padding: 28px 32px; }
+    .profile-name-ja { font-size: 1.6rem; font-weight: 900; margin-bottom: 2px; letter-spacing: 0.02em; }
+    .profile-name-en { font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); }
+    .profile-name-wrap { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 12px; }
+    .profile-icon { height: 80px; width: auto; display: block; }
+    .profile-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+    .profile-table tr { border-bottom: 1px solid var(--border-light); }
+    .profile-table tr:last-child { border-bottom: none; }
+    .profile-table th { width: 80px; padding: 8px 0; color: var(--muted); font-weight: 700; text-align: left; white-space: nowrap; vertical-align: top; font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .profile-table td { padding: 8px 0 8px 12px; }
+    .profile-table a { color: var(--accent); }
+    .profile-tabs { display: flex; gap: 0; border-top: 2px solid var(--border); background: var(--bg2); }
+    .profile-tab-btn { padding: 10px 20px; border: none; border-right: 1px solid var(--border-light); background: transparent; color: var(--muted); font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+    .profile-tab-btn:hover { color: var(--text); }
+    .profile-tab-btn.active { background: var(--accent); color: #fff; }
+    .profile-tab-content { display: none; padding: 24px 28px; }
+    .profile-tab-content.active { display: block; }
+    .profile-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .profile-list li { font-size: 0.78rem; color: var(--muted); display: flex; gap: 10px; align-items: flex-start; line-height: 1.7; }
+    .profile-list li::before { content: '—'; color: var(--accent); flex-shrink: 0; }
+    .award-item { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border-light); }
+    .award-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .award-year { font-size: 0.6rem; letter-spacing: 0.16em; color: var(--accent); font-weight: 700; text-transform: uppercase; margin-bottom: 3px; }
+    .award-title { font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; }
+    .award-desc { font-size: 0.72rem; color: var(--muted); line-height: 1.85; }
+    .achievements-link { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: var(--bg2); border: 2px solid var(--border-light); text-decoration: none; color: var(--text); transition: border-color 0.15s; }
+    .achievements-link:hover { border-color: var(--accent); text-decoration: none; }
+    .achievements-link .link-icon { font-size: 1.2rem; flex-shrink: 0; }
+    .achievements-link .link-text strong { display: block; font-size: 0.82rem; margin-bottom: 2px; }
+    .achievements-link .link-text span { font-size: 0.62rem; color: var(--muted); }
+    .profile-placeholder { padding: 48px 24px; text-align: center; }
+    .profile-placeholder p { font-size: 0.72rem; color: var(--muted); margin-top: 8px; }
+
+    /* Footer */
+    footer { background: var(--text); border-top: 3px solid var(--accent); padding: 48px 40px 0; }
+    .footer-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: flex-start; justify-content: space-between; gap: 40px; flex-wrap: wrap; padding-bottom: 40px; }
+    .footer-brand { font-size: 1.5rem; font-weight: 900; color: var(--bg); margin-bottom: 6px; letter-spacing: 0.04em; }
+    .footer-tagline { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
+    .footer-nav { display: flex; flex-direction: column; gap: 10px; }
+    .footer-nav a { font-size: 0.65rem; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(242,238,229,0.5); transition: color 0.15s; }
+    .footer-nav a:hover { color: var(--bg); }
+    .footer-copy { max-width: 1100px; margin: 0 auto; border-top: 1px solid rgba(255,255,255,0.1); padding: 16px 0; font-size: 0.6rem; letter-spacing: 0.12em; color: rgba(242,238,229,0.3); }
+
+    @media (max-width: 480px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none !important; }
+      .hamburger { display: flex; }
+      section { padding: 40px 20px 56px; }
+      .page-header { padding-left: 20px; padding-right: 20px; }
+      .stamp { display: none; }
+      .member-cards { grid-template-columns: 1fr; }
+      .member-card { border-right: none; border-bottom: 2px solid var(--border); }
+      .member-card:last-child { border-bottom: none; }
+      .profile-section { padding-left: 20px; padding-right: 20px; }
+      .profile-top { grid-template-columns: 1fr; }
+      .profile-photo-wrap { border-right: none; border-bottom: 2px solid var(--border); }
+      .profile-photo-wrap img { height: 200px; }
+      .profile-intro { padding: 20px; }
+      footer { padding: 40px 20px 0; }
+      .footer-inner { flex-direction: column; gap: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo"><img src="赤アイコン.png" alt="野心会" />野心会</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Top</a></li>
+    <li><a href="members.html" class="active">Members</a></li>
+    <li><a href="activities.html">Activities</a></li>
+    <li><a href="join.html">Join</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <div class="hamburger" id="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html" onclick="closeMenu()">Top</a>
+  <a href="members.html" onclick="closeMenu()">Members</a>
+  <a href="activities.html" onclick="closeMenu()">Activities</a>
+  <a href="join.html" onclick="closeMenu()">Join</a>
+  <a href="contact.html" onclick="closeMenu()">Contact</a>
+</div>
+
+<div class="page-header">
+  <div class="fade-in">
+    <span class="page-label">Members</span>
+    <h1>メンバー紹介</h1>
+    <p>野心会を構成する、個性豊かな挑戦者たちです。</p>
+  </div>
+  <div id="stamp-img" class="stamp" style="border:none;background-color:transparent;background-size:contain;background-repeat:no-repeat;background-position:center;border-radius:0;padding:0;"></div>
+</div>
+
+<div class="divider"></div>
+
+<section>
+  <div class="member-cards fade-in">
+    <div class="member-card clickable" onclick="document.getElementById('profile-obuchi').scrollIntoView({behavior:'smooth',block:'start'})">
+      <div class="member-avatar"><img src="小渕さん.jpg" alt="小渕浩平" /></div>
+      <div class="member-name">小渕 浩平</div>
+      <div class="member-handle"><a href="https://twitter.com/bc7_ot" target="_blank" onclick="event.stopPropagation()">@bc7_ot</a></div>
+      <div class="member-bio">野心会の共同創設者。作業療法士・研究者として脳血管障害リハビリや運転支援を専門とし、学術・地域活動に精力的に取り組む。</div>
+      <div class="member-tags">
+        <span class="tag">作業療法士</span>
+        <span class="tag">研究者</span>
+        <span class="tag">脳血管障害</span>
+        <span class="tag">運転支援</span>
+      </div>
+      <div class="member-card-arrow">▼ 詳細を見る</div>
+    </div>
+    <div class="member-card clickable" onclick="document.getElementById('profile-okita').scrollIntoView({behavior:'smooth',block:'start'})">
+      <div class="member-avatar"><img src="沖田　勇帆.png" alt="沖田勇帆" /></div>
+      <div class="member-name">沖田 勇帆</div>
+      <div class="member-handle"><a href="https://twitter.com/OkitaYuho" target="_blank" onclick="event.stopPropagation()">@OkitaYuho</a></div>
+      <div class="member-bio">野心会の共同創設者。オーストラリア在住の作業療法士。テレヘルス・デジタルヘルスの実装と日豪連携に取り組む。</div>
+      <div class="member-tags">
+        <span class="tag">作業療法士</span>
+        <span class="tag">テレヘルス</span>
+        <span class="tag">デジタルヘルス</span>
+      </div>
+      <div class="member-card-arrow">▼ 詳細を見る</div>
+    </div>
+    <div class="member-card clickable" onclick="document.getElementById('profile-anmoto').scrollIntoView({behavior:'smooth',block:'start'})">
+      <div class="member-avatar"><img src="庵本　直也.jpg" alt="庵本直矢" /></div>
+      <div class="member-name">庵本 直矢</div>
+      <div class="member-handle"><a href="https://twitter.com/naoya_758" target="_blank" onclick="event.stopPropagation()">@naoya_758</a></div>
+      <div class="member-bio">野心会の共同創設者。作業療法士・名古屋大学大学院博士後期課程。脳卒中後の上肢機能障害と脳画像予後予測を専門とし、JSCOT理事として学会運営にも携わる。</div>
+      <div class="member-tags">
+        <span class="tag">作業療法士</span>
+        <span class="tag">脳卒中リハビリ</span>
+        <span class="tag">脳画像</span>
+        <span class="tag">JSCOT理事</span>
+      </div>
+      <div class="member-card-arrow">▼ 詳細を見る</div>
+    </div>
+    <div class="member-card member-placeholder" style="grid-column: 1 / -1; border-right: none; border-top: 2px solid var(--border); display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 24px; padding: 24px 32px; text-align: left;">
+      <div class="member-avatar" style="border-style:dashed; flex-shrink:0; margin:0;">＋</div>
+      <div>
+        <div class="member-name" style="color:#1a1a1a;">募集中</div>
+        <div class="member-handle" style="color:#1a1a1a;">@coming_soon</div>
+        <div class="member-bio" style="margin-bottom:8px;">次の野心家はあなたかもしれない。</div>
+        <div class="member-tags"><span class="tag">Recruiting</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 詳細プロフィール -->
+<div style="padding: 64px 40px 0; max-width: 1100px; margin: 0 auto;">
+  <span class="profile-block-title fade-in">Member Profile</span>
+</div>
+
+<!-- 小渕浩平 -->
+<div class="profile-section fade-in" id="profile-obuchi">
+  <div class="profile-card">
+    <div class="profile-top">
+      <div class="profile-photo-wrap">
+        <img src="小渕さん.jpg" alt="小渕浩平" />
+      </div>
+      <div class="profile-intro">
+        <div class="profile-name-ja">小渕 浩平</div>
+        <div class="profile-name-en">Kohei Obuchi</div>
+        <table class="profile-table">
+          <tr><th>所属</th><td>信州大学医学部保健学科 作業療法学専攻 助教（2026年4月〜）</td></tr>
+          <tr><th>所在地</th><td>長野県</td></tr>
+          <tr><th>学歴</th><td>博士（保健学）・修士（信州大学大学院）</td></tr>
+          <tr><th>資格</th><td>専門作業療法士（脳血管障害／運転と地域移動支援）・認定作業療法士</td></tr>
+          <tr><th>SNS</th><td><a href="https://twitter.com/bc7_ot" target="_blank">@bc7_ot</a>（クリックするとX（旧:Twitter）に飛びます）</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="profile-tabs">
+      <button class="profile-tab-btn active" onclick="switchProfileTab('obuchi-roles', this)">役職・活動</button>
+      <button class="profile-tab-btn" onclick="switchProfileTab('obuchi-research', this)">研究分野</button>
+      <button class="profile-tab-btn" onclick="switchProfileTab('obuchi-awards', this)">受賞歴</button>
+      <button class="profile-tab-btn" onclick="switchProfileTab('obuchi-books', this)">著書・講演</button>
+      <button class="profile-tab-btn" onclick="switchProfileTab('obuchi-grants', this)">助成・教育</button>
+      <button class="profile-tab-btn" onclick="switchProfileTab('obuchi-achievements', this)">業績</button>
+    </div>
+    <div id="obuchi-roles" class="profile-tab-content active">
+      <ul class="profile-list">
+        <li><span style="color:var(--accent);font-weight:700;">2026年4月〜</span>信州大学医学部保健学科 作業療法学専攻 助教</li>
+        <li><span style="color:var(--accent);font-weight:700;">2025年3月〜</span>運転と作業療法学会 広報委員会</li>
+        <li><span style="color:var(--accent);font-weight:700;">2024年9月〜</span>専門作業療法士（脳血管）ネットワーク 副代表理事</li>
+        <li><span style="color:var(--accent);font-weight:700;">2024年7月〜</span>長野県作業療法士協会 地域包括ケアシステム推進委員会 委員長</li>
+        <li><span style="color:var(--accent);font-weight:700;">2024年6月〜</span>日本臨床作業療法学会 理事</li>
+        <li><span style="color:var(--accent);font-weight:700;">2023年6月〜</span>長野県小布施町 移動外出支援「えべさの会」 副会長</li>
+        <li><span style="color:var(--accent);font-weight:700;">2021年4月〜</span>小布施町役場 健康福祉課 一般介護予防事業評価事業 研究員</li>
+      </ul>
+    </div>
+    <div id="obuchi-research" class="profile-tab-content">
+      <ul class="profile-list">
+        <li>脳卒中後上肢麻痺に対する修正CI療法・Transfer Package</li>
+        <li>脳損傷者の自動車運転再開支援（ドライビングシミュレーター評価）</li>
+        <li>地域在住高齢者の健康関連QOL・意味のある活動・フレイル</li>
+        <li>住民互助型・地域共創型移動外出支援（アクションリサーチ）</li>
+      </ul>
+    </div>
+    <div id="obuchi-awards" class="profile-tab-content">
+      <div class="award-item">
+        <div class="award-year">2026年3月</div>
+        <div class="award-title">竹内松次郎賞（大学院優秀学生賞）</div>
+        <div class="award-desc">信州大学大学院総合医理工学研究科医学系専攻保健学分野</div>
+      </div>
+      <div class="award-item">
+        <div class="award-year">2025年12月</div>
+        <div class="award-title">最優秀演題賞（症例・実践報告）</div>
+        <div class="award-desc">第4回日本老年療法学会／「作業療法士が関与した地域共創型移動支援サービスの立ち上げと発展：農村地域における実践報告」</div>
+      </div>
+      <div class="award-item">
+        <div class="award-year">2024年8月</div>
+        <div class="award-title">最優秀論文賞（学術誌『作業療法』第42巻）</div>
+        <div class="award-desc">日本作業療法士協会／「急性期病床入院中の脳損傷者に対するドライビングシミュレーターを用いた自動車運転評価と運転再開・非再開の関係性—ケースコントロール研究—」</div>
+      </div>
+      <div class="award-item">
+        <div class="award-year">2024年6月</div>
+        <div class="award-title">大会奨励賞</div>
+        <div class="award-desc">第39回長野県作業療法学術大会／「地域住民とつくる互助活動としての移動・外出支援の創出経験からみえた作業療法士の関わりしろ」</div>
+      </div>
+      <div class="award-item">
+        <div class="award-year">2022年5月</div>
+        <div class="award-title">優秀演題表彰 最優秀賞</div>
+        <div class="award-desc">第8回日本臨床作業療法学会／「急性期脳卒中後の上肢麻痺に対する修正CI療法の短期経過：傾向スコアマッチングを用いたケースコントロール研究」</div>
+      </div>
+      <div class="award-item">
+        <div class="award-year">2022年2月</div>
+        <div class="award-title">優秀演題賞</div>
+        <div class="award-desc">第33回長野松代総合病院学会／「急性期病院におけるDSを用いた脳損傷者に対する自動車運転支援の試み」</div>
+      </div>
+    </div>
+    <div id="obuchi-books" class="profile-tab-content">
+      <p style="font-size:0.72rem;font-weight:700;letter-spacing:0.12em;color:var(--accent);margin-bottom:8px;">著書・分担執筆（5冊）</p>
+      <ul class="profile-list" style="margin-bottom:20px;">
+        <li><span style="color:var(--accent);font-weight:700;">2024年11月</span>「21人の作業療法士」とひらく、私らしいキャリア（医学書院）― EPISODE 6「医療機関に軸足をおきながら身近な地域への貢献に挑戦する田舎の作業療法士」</li>
+        <li><span style="color:var(--accent);font-weight:700;">2023年4月</span>PT・OT・STのための臨床5年目までに知っておきたい予後予測の考えかた（医学書院）― 第2章 全身管理における機能予後予測（脳血管疾患/神経筋疾患）</li>
+        <li><span style="color:var(--accent);font-weight:700;">2022年12月</span>臨床作業療法NOVA 疾患別エビデンスベースのアプローチ（青海社）― 整形外科疾患（1）関節リウマチのアウトカムと作業療法</li>
+        <li><span style="color:var(--accent);font-weight:700;">2022年9月</span>作業で語る事例報告 第2版（医学書院）― 麻痺手での食事動作を獲得し独居生活に復帰した事例</li>
+        <li><span style="color:var(--accent);font-weight:700;">2021年9月</span>作業で紡ぐ 上肢機能アプローチ（医学書院）― CI療法①急性期CI療法</li>
+      </ul>
+      <p style="font-size:0.72rem;font-weight:700;letter-spacing:0.12em;color:var(--accent);margin-bottom:8px;">主な招待講演</p>
+      <ul class="profile-list">
+        <li><span style="color:var(--accent);font-weight:700;">2025年10月</span>運転と作業療法学会 応用研修会「高齢者と地域住民が共に創る，地域に根ざした移動支援の実践」</li>
+        <li><span style="color:var(--accent);font-weight:700;">2025年6月</span>自動車運転再開作業療法検討委員会研修会 in 鹿児島「急性期病院での自動車運転評価・支援の実際／住民互助による移動外出支援事業の実際」</li>
+        <li><span style="color:var(--accent);font-weight:700;">2024年10月</span>日本臨床作業療法学会 研修会「チームで取り組む総合病院のほどほどなOBP実践」</li>
+        <li><span style="color:var(--accent);font-weight:700;">2023年11月</span>第57回日本作業療法士協会 専門作業療法士セミナー 脳血管障害「専門作業療法士としてのエビデンスの向き合い方」</li>
+        <li><span style="color:var(--accent);font-weight:700;">2021年8月</span>第8回日本臨床作業療法学会 シンポジウム「急性期から生活期における脳卒中後上肢麻痺に対するアプローチ」</li>
+        <li>第23回東海北陸作業療法学会 セミナー「脳血管障害×作業の力を魅せつけろ：医療から地域までの私なりの実践報告」</li>
+      </ul>
+    </div>
+
+    <div id="obuchi-grants" class="profile-tab-content">
+      <p style="font-size:0.72rem;font-weight:700;letter-spacing:0.12em;color:var(--accent);margin-bottom:8px;">競争的資金・研究助成</p>
+      <ul class="profile-list" style="margin-bottom:20px;">
+        <li><span style="color:var(--accent);font-weight:700;">2024年4月〜2025年3月</span>運転と作業療法研究会 研究助成（10万円）「作業療法士による地域共創型移動・外出支援事業の実践と効果：アクションリサーチによる取り組み」（代表）</li>
+        <li><span style="color:var(--accent);font-weight:700;">2024年8月</span>公益財団法人 さわやか福祉財団 地域助け合い基金（15万円）（代表）</li>
+        <li><span style="color:var(--accent);font-weight:700;">2022年4月〜2023年3月</span>（一社）日本作業療法士協会 課題研究助成制度 研究Ⅱ（30万円）「急性期の脳損傷者におけるDSを用いた自動車運転評価と運転再可否の関係性」（代表）</li>
+      </ul>
+      <p style="font-size:0.72rem;font-weight:700;letter-spacing:0.12em;color:var(--accent);margin-bottom:8px;">担当授業・教育活動</p>
+      <ul class="profile-list">
+        <li><span style="color:var(--accent);font-weight:700;">信州大学医学部（2024〜）</span>老年期作業療法学Ⅰ「地域高齢者への作業療法について」</li>
+        <li><span style="color:var(--accent);font-weight:700;">東京都立大学大学院（2024〜）</span>健康増進作業療法学特論「What can hospital therapists contribute to community building?」</li>
+        <li><span style="color:var(--accent);font-weight:700;">長野保健医療大学（2022〜）</span>地域支援・地域貢献活動に関する講義（招待）</li>
+        <li><span style="color:var(--accent);font-weight:700;">メディカルオンライン動画（2025年12月〜）</span>脳卒中後の上肢麻痺に対する作業療法</li>
+      </ul>
+    </div>
+
+    <div id="obuchi-achievements" class="profile-tab-content">
+      <a href="https://researchmap.jp/K-obuchi" target="_blank" class="achievements-link" style="margin-bottom:8px;">
+        <div class="link-icon">📄</div>
+        <div class="link-text">
+          <strong>researchmap — 小渕 浩平</strong>
+          <span>論文・研究発表・著書など業績一覧はこちら</span>
+        </div>
+        <span style="margin-left:auto;color:var(--accent);font-size:1rem;">↗</span>
+      </a>
+      <a href="https://scholar.google.com/citations?user=7w_6RPgAAAAJ&hl=ja" target="_blank" class="achievements-link" style="margin-bottom:16px;">
+        <div class="link-icon">🎓</div>
+        <div class="link-text">
+          <strong>Google Scholar — 小渕 浩平</strong>
+          <span>引用・被引用情報など</span>
+        </div>
+        <span style="margin-left:auto;color:var(--accent);font-size:1rem;">↗</span>
+      </a>
+      <div class="award-item">
+        <div class="award-year">主要論文（筆頭著者）</div>
+        <div class="award-title" style="font-size:0.78rem;font-weight:400;color:var(--muted);line-height:1.95;">
+          2026 — <em>Medicine</em> 105(7)：Early clinical indicators for predicting discharge destination from the acute stroke ward（共著）<br>
+          2025 — <em>日本老年療法学会誌</em> 2025(4)：アクションリサーチによる住民互助型の移動外出支援サービス立ち上げのプロセスと作業療法士の果たしうる役割<br>
+          2025 — <em>Occupational Therapy in Health Care</em>：Association Between Meaningful Activities and Frailty in Community-Dwelling Older Adults in Rural Japan<br>
+          2025 — <em>British Journal of Occupational Therapy</em>：Performance and satisfaction with meaningful occupations as predictors of health-related quality of life<br>
+          2025 — <em>作業療法</em> 44(2)：急性期脳卒中患者におけるトイレ動作自立に関連する要因の相互作用について（共著）<br>
+          2024 — <em>Journal of Applied Gerontology</em>：Factors Associated With Health-Related Quality of Life Among Community-Dwelling Older Adults Without Social Participation in Japan（共著）<br>
+          2023 — <em>Disability and Rehabilitation</em>：Therapeutic effect of adjuvant therapy added to CI movement therapy: a systematic review and meta-analysis（共著）<br>
+          2023 — <em>作業療法</em> 42(3), 279-288：急性期病床入院中の脳損傷者に対するDSを用いた自動車運転評価と運転再開・非再開の関係性 ◀ <strong>最優秀論文賞受賞</strong><br>
+          2022 — <em>作業療法</em> 41(6), 703-710：急性期脳卒中後の上肢麻痺に対する修正CI療法の短期効果の推定—傾向スコアマッチングを用いた後ろ向きコホート研究—<br>
+          2022 — <em>作業療法</em> 41(6), 694-702：急性期脳卒中後の上肢麻痺に対する修正CI療法の1年後経過—ケースシリーズ研究—<br>
+          2019 — <em>作業療法</em> 38(4)：慢性期脳卒中後の上肢運動障害に対するTransfer Packageを中心とした週1回20分の外来作業療法
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 沖田勇帆 -->
+<div class="profile-section fade-in" id="profile-okita" style="margin-top: 3px;">
+  <div class="profile-card">
+    <div class="profile-top">
+      <div class="profile-photo-wrap">
+        <img src="沖田　勇帆.png" alt="沖田勇帆" />
+      </div>
+      <div class="profile-intro">
+        <div class="profile-name-ja">沖田 勇帆</div>
+        <div class="profile-name-en">Yuho Okita</div>
+        <table class="profile-table">
+          <tr><th>現職①</th><td>Autism Abilities（メルボルン） Allied Health Service Manager（2024年10月〜）</td></tr>
+          <tr><th>現職②</th><td>モナッシュ大学 Teaching Associate／北海道文教大学 客員准教授／東京工科大学 臨床講師</td></tr>
+          <tr><th>在籍</th><td>スウィンバーン工科大学 大学院 保健学系 博士課程（慢性疼痛×遠隔リハビリテーション）</td></tr>
+          <tr><th>所在地</th><td>オーストラリア・メルボルン</td></tr>
+          <tr><th>学歴</th><td>修士（作業療法学）2019年 Swinburne University of Technology／Bachelor of Exercise Science with Honours 2016年 Griffith University</td></tr>
+          <tr><th>ORCID</th><td>0000-0002-8455-3301</td></tr>
+          <tr><th>SNS</th><td><a href="https://twitter.com/OkitaYuho" target="_blank">@OkitaYuho</a>（クリックするとX（旧:Twitter）に飛びます）</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="profile-tabs">
+      <button class="profile-tab-btn active" onclick="switchProfileTab('okita-career', this)">経歴</button>
+      <button class="profile-tab-btn" onclick="switchProfileTab('okita-specialty', this)">専門性</button>
+      <button class="profile-tab-btn" onclick="switchProfileTab('okita-activity', this)">現在の活動</button>
+      <button class="profile-tab-btn" onclick="switchProfileTab('okita-books', this)">著書・講演</button>
+      <button class="profile-tab-btn" onclick="switchProfileTab('okita-community', this)">コミュニティ活動</button>
+      <button class="profile-tab-btn" onclick="switchProfileTab('okita-achievements', this)">業績</button>
+    </div>
+    <div id="okita-career" class="profile-tab-content active">
+      <ul class="profile-list">
+        <li><span style="color:var(--accent);font-weight:700;flex-shrink:0;min-width:80px;">2011年</span>高校卒業後、オーストラリア・シドニーへ渡る（語学学校・UNSW進学コース修了）</li>
+        <li><span style="color:var(--accent);font-weight:700;flex-shrink:0;min-width:80px;">2014年</span>Griffith University（グリフィス大学）運動科学コース進学 → 2016年 優等学位取得</li>
+        <li><span style="color:var(--accent);font-weight:700;flex-shrink:0;min-width:80px;">2017年</span>Swinburne University of Technology 作業療法修士課程進学</li>
+        <li><span style="color:var(--accent);font-weight:700;flex-shrink:0;min-width:80px;">2019年7月</span>AHPRA（オーストラリア医療従事者登録機関）に作業療法士として登録・資格取得</li>
+        <li><span style="color:var(--accent);font-weight:700;flex-shrink:0;min-width:80px;">2019年〜</span>Soaring Health Sport, Wellness & Community Centre 作業療法士（入職初年度にOT部門新設・半年で150名超規模へ拡大）</li>
+        <li><span style="color:var(--accent);font-weight:700;flex-shrink:0;min-width:80px;">2021年</span>スウィンバーン工科大学 博士課程進学（全額免除奨学金 約1,400万円相当）</li>
+        <li><span style="color:var(--accent);font-weight:700;flex-shrink:0;min-width:80px;">2023年4月〜</span>モナッシュ大学 Teaching Associate / 北海道文教大学 客員准教授 / 東京工科大学 臨床講師</li>
+        <li><span style="color:var(--accent);font-weight:700;flex-shrink:0;min-width:80px;">2023年4月</span>オーストラリア永住権取得</li>
+        <li><span style="color:var(--accent);font-weight:700;flex-shrink:0;min-width:80px;">2024年10月〜</span>Autism Abilities（自閉症支援専門施設） Allied Health Service Manager（現職）</li>
+      </ul>
+    </div>
+    <div id="okita-specialty" class="profile-tab-content">
+      <ul class="profile-list">
+        <li>慢性疼痛×遠隔リハビリテーション（博士課程研究 — データ収集・論文執筆完了）</li>
+        <li>目標設定（Goal-Setting）の理論・実践研究（スコーピングレビュー・国際共同研究）</li>
+        <li>作業療法スコーピングレビュー研究・WFOT国際研究優先課題の整理</li>
+        <li>支援技術・アクセシブルゲーミング（e-Sports×OT・ARATA SIG委員）</li>
+        <li>VR・ウェアラブルデバイスを用いたリハビリテーション評価</li>
+      </ul>
+    </div>
+    <div id="okita-activity" class="profile-tab-content">
+      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:16px;line-height:1.9;letter-spacing:0.04em;">Allied Health Service Managerとして、自閉症支援専門施設のリハビリテーション部門立ち上げ・多職種チームマネジメントに従事。日本臨床作業療法学会（COT）国際部 設立メンバー・理事として日本とオーストラリア・世界をつなぐ活動を推進。</p>
+      <ul class="profile-list">
+        <li>日本臨床作業療法学会（COT）国際部 設立メンバー・理事</li>
+        <li>ARATA（オーストラリア支援技術協会）ゲーミング SIG 委員（2023年〜）</li>
+        <li>オーストラリア・ニュージーランド日本人研究者会 幹事（2024年12月〜）</li>
+        <li>TOM（Technology and Occupation for the Mind）国際フェローシッププログラム修了（2023年）</li>
+        <li>AATC 2026 大会組織委員</li>
+        <li>日本とオーストラリアの連携・人材育成・実装に関する情報発信</li>
+        <li>自閉症協会による国家プロジェクトで日本人家族向けワークショップ企画・運営、自閉症啓発動画（日本語）ナレーター担当</li>
+      </ul>
+    </div>
+    <div id="okita-books" class="profile-tab-content">
+      <p style="font-size:0.72rem;font-weight:700;letter-spacing:0.12em;color:var(--accent);margin-bottom:8px;">著書・連載</p>
+      <ul class="profile-list" style="margin-bottom:20px;">
+        <li><span style="color:var(--accent);font-weight:700;">2024年</span>目標設定のエビデンス（連載）「目標設定とそのエビデンス」― 友利幸之介・大野勘太・澤田辰徳・沖田勇帆</li>
+      </ul>
+      <p style="font-size:0.72rem;font-weight:700;letter-spacing:0.12em;color:var(--accent);margin-bottom:8px;">世界学会発表（WFOT Congress 2022 / Paris）</p>
+      <ul class="profile-list" style="margin-bottom:20px;">
+        <li><span style="color:var(--accent);font-weight:700;">第1著者</span>Utilization of a goal setting tool in a rehabilitation: a scoping review</li>
+        <li><span style="color:var(--accent);font-weight:700;">第2著者</span>Strategies for shared-decision making in goal-setting</li>
+        <li><span style="color:var(--accent);font-weight:700;">第2著者</span>A scoping review on occupational therapy scoping reviews</li>
+        <li><span style="color:var(--accent);font-weight:700;">第3著者</span>Development of an English-language version of a Japanese iPad application for Collaborative Goal-setting in School-based OT</li>
+      </ul>
+      <p style="font-size:0.72rem;font-weight:700;letter-spacing:0.12em;color:var(--accent);margin-bottom:8px;">主な学術活動・ワークショップ</p>
+      <ul class="profile-list">
+        <li><span style="color:var(--accent);font-weight:700;">2024年9月</span>第9回日本臨床作業療法学会（広島）ワークショップ「作業療法におけるe-Sportsの可能性」主催（日本・台湾・韓国の療法士との国際連携）</li>
+        <li><span style="color:var(--accent);font-weight:700;">2023年</span>Oceania Seating Symposium ワークショップ開催（ARATA SIG）</li>
+        <li><span style="color:var(--accent);font-weight:700;">2022年</span>Australian Assistive Technology Conference（AATC）初のPhD研究成果発表</li>
+      </ul>
+    </div>
+
+    <div id="okita-community" class="profile-tab-content">
+      <p style="font-size:0.72rem;font-weight:700;letter-spacing:0.12em;color:var(--accent);margin-bottom:8px;">学術コミュニティ・委員活動</p>
+      <ul class="profile-list" style="margin-bottom:20px;">
+        <li><span style="color:var(--accent);font-weight:700;">日本臨床作業療法学会（COT）</span>国際部 設立メンバー・理事 ― 日本とオーストラリア・世界をつなぐ活動を推進</li>
+        <li><span style="color:var(--accent);font-weight:700;">ARATA（豪NZ支援技術協会）</span>ゲーミング SIG 委員（2023年〜） ― アクセシブルゲーミングの普及・研究発信</li>
+        <li><span style="color:var(--accent);font-weight:700;">AATC 2026</span>大会組織委員</li>
+        <li><span style="color:var(--accent);font-weight:700;">オーストラリア・ニュージーランド日本人研究者会</span>幹事（2024年12月〜）</li>
+        <li><span style="color:var(--accent);font-weight:700;">TOM（Technology and Occupation for the Mind）</span>国際フェローシッププログラム修了（2023年）― TOM-Japan立ち上げ支援、オーストラリアチームが「Development Funding」受賞</li>
+      </ul>
+      <p style="font-size:0.72rem;font-weight:700;letter-spacing:0.12em;color:var(--accent);margin-bottom:8px;">地域・社会貢献</p>
+      <ul class="profile-list">
+        <li>オーストラリア自閉症協会 国家プロジェクト ― 日本人家族向けワークショップ企画・運営</li>
+        <li>自閉症・NDIS啓発動画（日本語）ナレーター担当</li>
+        <li>🇯🇵↔🇦🇺 日本とオーストラリアの連携・人材育成・実装に関する情報発信</li>
+      </ul>
+    </div>
+
+    <div id="okita-achievements" class="profile-tab-content">
+      <a href="https://linktr.ee/yuhookita" target="_blank" class="achievements-link" style="margin-bottom:8px;">
+        <div class="link-icon">🔗</div>
+        <div class="link-text">
+          <strong>Linktree — 沖田 勇帆</strong>
+          <span>各種リンクまとめはこちら</span>
+        </div>
+        <span style="margin-left:auto;color:var(--accent);font-size:1rem;">↗</span>
+      </a>
+      <a href="https://orcid.org/0000-0002-8455-3301" target="_blank" class="achievements-link" style="margin-bottom:8px;">
+        <div class="link-icon">🔬</div>
+        <div class="link-text">
+          <strong>ORCID — 沖田 勇帆</strong>
+          <span>査読付き論文・発表（29件以上）</span>
+        </div>
+        <span style="margin-left:auto;color:var(--accent);font-size:1rem;">↗</span>
+      </a>
+      <a href="https://scholar.google.com/citations?user=wBDqAX0AAAAJ&hl=en&oi=ao" target="_blank" class="achievements-link" style="margin-bottom:8px;">
+        <div class="link-icon">🎓</div>
+        <div class="link-text">
+          <strong>Google Scholar — 沖田 勇帆</strong>
+          <span>被引用数258以上（2024年時点）</span>
+        </div>
+        <span style="margin-left:auto;color:var(--accent);font-size:1rem;">↗</span>
+      </a>
+      <a href="https://www.researchgate.net/profile/Yuho-Okita-2" target="_blank" class="achievements-link" style="margin-bottom:16px;">
+        <div class="link-icon">📄</div>
+        <div class="link-text">
+          <strong>ResearchGate — 沖田 勇帆</strong>
+          <span>論文・発表一覧</span>
+        </div>
+        <span style="margin-left:auto;color:var(--accent);font-size:1rem;">↗</span>
+      </a>
+      <div class="award-item">
+        <div class="award-year">主要論文・筆頭著者（29件以上）</div>
+        <div class="award-title" style="font-size:0.78rem;font-weight:400;color:var(--muted);line-height:1.95;">
+          2024 — <em>Clinical Rehabilitation</em>：Characteristics of goal-setting tools in adult rehabilitation: A scoping review<br>
+          2024 — Goal setting in occupational therapy for mental health: a scoping review<br>
+          2023 — <em>World Federation of Occupational Therapists Bulletin</em> 79(2)：A scoping review of occupational therapy scoping reviews（廣瀬卓哉・長志保・高瀬駿 他との国際共著）
+        </div>
+      </div>
+      <div class="award-item">
+        <div class="award-year">主要な共著論文</div>
+        <div class="award-title" style="font-size:0.78rem;font-weight:400;color:var(--muted);line-height:1.95;">
+          2023 — <em>Int J Environmental Research and Public Health</em> 20(11): 6055：The Conceptual Analysis of Collaboration in OT（澤田辰徳・大野勘太・友利幸之介 他）<br>
+          2023 — <em>Clinical Neurology and Neurosurgery</em>：Development of the Japanese version of the awareness questionnaire after acquired brain injury（梶本知紀・竹林崇 他）<br>
+          2023 — <em>Asian Journal of Occupational Therapy</em> 20(1)：A Scoping Review of E-learning in Occupational Therapy<br>
+          2022 — <em>Journal of NeuroEngineering and Rehabilitation</em>：Impact of robotic-assistance level on upper extremity function in stroke（竹林崇 他）<br>
+          2022 — <em>Topics in Stroke Rehabilitation</em>：Structural validity and internal consistency of the Fugl-Meyer Assessment upper extremity（田内裕人・京極真・竹林崇 他）<br>
+          2022 — <em>Clinical Neurology and Neurosurgery</em>：Factors associated with prognosis of upper limb function in branch atheromatous disease（徳田和宏・花田恵介・竹林崇 他）<br>
+          2021 — <em>Journal of Occupational Science</em>：Effects of collaborative consultation using iPad application in school-based OT（山口泉・奥津真司・友利幸之介 他）
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 庵本直矢 -->
+<div class="profile-section fade-in" id="profile-anmoto" style="margin-top: 3px;">
+  <div class="profile-card">
+    <div class="profile-top">
+      <div class="profile-photo-wrap">
+        <img src="庵本　直也.jpg" alt="庵本直矢" />
+      </div>
+      <div class="profile-intro">
+        <div class="profile-name-ja">庵本 直矢</div>
+        <div class="profile-name-en">Naoya Anmoto</div>
+        <table class="profile-table">
+          <tr><th>所在地</th><td>愛知県</td></tr>
+          <tr><th>所属①</th><td>名古屋市総合リハビリテーション事業団（名古屋市立大学リハビリテーション病院）作業療法科</td></tr>
+          <tr><th>所属②</th><td>名古屋大学大学院 医学系研究科 総合保健学専攻 博士後期課程（2025年4月〜）</td></tr>
+          <tr><th>学歴</th><td>名古屋大学医学部保健学科（2013年卒）→ 同大学院修士課程（2023〜2025年）→ 同博士後期課程（2025年〜）</td></tr>
+          <tr><th>ORCID</th><td>0000-0002-8388-9815</td></tr>
+          <tr><th>SNS</th><td><a href="https://twitter.com/naoya_758" target="_blank">@naoya_758</a>（クリックするとX（旧:Twitter）に飛びます）</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="profile-tabs">
+      <button class="profile-tab-btn active" onclick="switchProfileTab('anmoto-roles', this)">役職・活動</button>
+      <button class="profile-tab-btn" onclick="switchProfileTab('anmoto-research', this)">研究分野</button>
+      <button class="profile-tab-btn" onclick="switchProfileTab('anmoto-presentations', this)">学会発表</button>
+      <button class="profile-tab-btn" onclick="switchProfileTab('anmoto-community', this)">コミュニティ活動</button>
+      <button class="profile-tab-btn" onclick="switchProfileTab('anmoto-achievements', this)">業績</button>
+    </div>
+    <div id="anmoto-roles" class="profile-tab-content active">
+      <ul class="profile-list">
+        <li>日本臨床作業療法学会（JSCOT）理事</li>
+        <li>第11回日本臨床作業療法学会学術大会（11thCOT、2026年12月・大阪公立大学）プログラム運営関与</li>
+        <li>野心会 運営メンバー</li>
+      </ul>
+    </div>
+    <div id="anmoto-research" class="profile-tab-content">
+      <ul class="profile-list">
+        <li>脳卒中後上肢麻痺に対するロボット療法（ReoGo®-J）×修正CI療法の複合療法（メタアナリシス・RCT研究含む）</li>
+        <li>BMI（Brain-Machine Interface）×ボツリヌス療法による重度上肢麻痺への次世代介入</li>
+        <li>DTI（拡散テンソル画像）を用いた脳卒中後上肢麻痺の予後予測</li>
+        <li>脳卒中後上肢運動失調に対するロボット療法と課題指向型訓練の組み合わせ</li>
+      </ul>
+    </div>
+    <div id="anmoto-presentations" class="profile-tab-content">
+      <p style="font-size:0.72rem;font-weight:700;letter-spacing:0.12em;color:var(--accent);margin-bottom:8px;">主要な学会発表（2024年度）</p>
+      <ul class="profile-list" style="margin-bottom:20px;">
+        <li><span style="color:var(--accent);font-weight:700;">第61回日本リハビリテーション医学会（2024年6月）筆頭</span>脳卒中後重度上肢麻痺を呈した症例に対するボツリヌス療法とBrain Machine Interfaceによる訓練の併用療法</li>
+        <li><span style="color:var(--accent);font-weight:700;">第18回日本作業療法研究学会（2024年8月）筆頭</span>回復期脳卒中患者における上肢麻痺の回帰式作成—Diffusion Tensor Imagingを含めた検討—</li>
+        <li><span style="color:var(--accent);font-weight:700;">第18回日本作業療法研究学会（2024年8月）共著</span>脳卒中後上肢運動失調を有する患者の上肢パフォーマンスの特性に関する検討（渡邉史織・庵本直矢・寳珠山稔）</li>
+        <li><span style="color:var(--accent);font-weight:700;">第23回東海北陸作業療法学会（2024年9月）共著</span>低酸素脳症後に記憶障害を呈した事例に対する、自己認識の向上を目的とした作業療法介入</li>
+      </ul>
+    </div>
+
+    <div id="anmoto-community" class="profile-tab-content">
+      <p style="font-size:0.72rem;font-weight:700;letter-spacing:0.12em;color:var(--accent);margin-bottom:8px;">学術コミュニティ・社会貢献</p>
+      <ul class="profile-list" style="margin-bottom:20px;">
+        <li>日本臨床作業療法学会（JSCOT）理事</li>
+        <li>第11回日本臨床作業療法学会学術大会（11thCOT、2026年12月・大阪公立大学）プログラム運営</li>
+        <li><span style="color:var(--accent);font-weight:700;">2024年3月</span>第9回日本臨床作業療法学会「作業療法士としての新たな一歩を踏み出すための事例報告と論文化」― 廣瀬卓哉・小渕浩平と共同登壇。臨床家の論文発信を推進</li>
+        <li>野心会 運営メンバー</li>
+      </ul>
+      <p style="font-size:0.72rem;font-weight:700;letter-spacing:0.12em;color:var(--accent);margin-bottom:8px;">研究助成</p>
+      <ul class="profile-list">
+        <li><span style="color:var(--accent);font-weight:700;">2019年度頃</span>名古屋市総合リハビリテーション事業団 研究助成「脳卒中後上肢麻痺に対するロボット療法を併用したCI療法の効果検証」（代表）</li>
+      </ul>
+    </div>
+
+    <div id="anmoto-achievements" class="profile-tab-content">
+      <a href="https://video.medicalonline.jp/medical-persons/83" target="_blank" class="achievements-link" style="margin-bottom:8px;">
+        <div class="link-icon">🎥</div>
+        <div class="link-text">
+          <strong>Medical Online — 庵本 直矢</strong>
+          <span>動画・講演・解説コンテンツはこちら</span>
+        </div>
+        <span style="margin-left:auto;color:var(--accent);font-size:1rem;">↗</span>
+      </a>
+      <a href="https://jglobal.jst.go.jp/detail?JGLOBAL_ID=202301017305211700" target="_blank" class="achievements-link" style="margin-bottom:8px;">
+        <div class="link-icon">🔬</div>
+        <div class="link-text">
+          <strong>J-GLOBAL — 庵本 直矢</strong>
+          <span>研究者情報・論文・特許など（JST）</span>
+        </div>
+        <span style="margin-left:auto;color:var(--accent);font-size:1rem;">↗</span>
+      </a>
+      <a href="https://researchmap.jp/nagoya_708" target="_blank" class="achievements-link" style="margin-bottom:16px;">
+        <div class="link-icon">📄</div>
+        <div class="link-text">
+          <strong>researchmap — 庵本 直矢</strong>
+          <span>論文・研究発表・著書など業績一覧はこちら</span>
+        </div>
+        <span style="margin-left:auto;color:var(--accent);font-size:1rem;">↗</span>
+      </a>
+      <div class="award-item">
+        <div class="award-year">主要論文（筆頭著者）</div>
+        <div class="award-title" style="font-size:0.78rem;font-weight:400;color:var(--muted);line-height:1.95;">
+          2025 — <em>Physiotherapy Research International</em>：Effects of Combining Robotic Assisted Therapy for Upper Limb With Other Therapeutic Approaches After Stroke: A Systematic Review and Meta-Analysis of RCTs<br>
+          2023 — <em>British Journal of Occupational Therapy</em>：Effectiveness of combining robotic therapy and modified CI movement therapy for moderate to severe upper limb paresis after stroke in subacute phase<br>
+          2021 — <em>作業療法</em> 40(2)：回復期での脳卒中後中等度から重度上肢麻痺に対するロボット療法と修正CI療法を組み合わせた介入の効果と退院後の経過<br>
+          2020 — <em>作業療法</em>：亜急性期での脳卒中後上肢麻痺に対するロボット療法と修正CI療法を組み合わせた治療の実践<br>
+          2018 — <em>作業療法</em> 37(6)：回復期における脳卒中後の上肢麻痺に対してロボット療法と修正CI療法を組み合わせた治療を実施した一症例<br>
+          2018 — <em>作業療法</em> 37(2)：脳卒中後上肢麻痺に対するReoGo®-Jを使用した回復期における自主練習の安全性および有用性の検討
+        </div>
+      </div>
+      <div class="award-item">
+        <div class="award-year">主要な共著論文</div>
+        <div class="award-title" style="font-size:0.78rem;font-weight:400;color:var(--muted);line-height:1.95;">
+          2023 — <em>Disability and Rehabilitation</em>：Therapeutic effect of adjuvant therapy added to constraint-induced movement therapy in patients with subacute to chronic stroke: a systematic review and meta-analysis（金子崇・前田雅訓・甲斐信也・庵本直矢・高瀬駿 他 / 竹林崇グループとの共著）
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">野心会</div>
+      <div class="footer-tagline">Yashinkai — Community of Ambition</div>
+    </div>
+    <div class="footer-nav">
+      <a href="index.html">Top</a>
+      <a href="members.html">Members</a>
+      <a href="activities.html">Activities</a>
+      <a href="join.html">Join</a>
+    </div>
+  </div>
+  <div class="footer-copy">&copy; 2026 野心会 All Rights Reserved.</div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver(e => e.forEach(x => { if (x.isIntersecting) x.target.classList.add('visible'); }), { threshold: 0.1 });
+  document.querySelectorAll('.fade-in').forEach(el => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      el.classList.add('visible');
+    } else {
+      observer.observe(el);
+    }
+  });
+  function toggleMenu() { document.getElementById('mobileMenu').classList.toggle('open'); document.getElementById('hamburger').classList.toggle('open'); }
+  function closeMenu() { document.getElementById('mobileMenu').classList.remove('open'); document.getElementById('hamburger').classList.remove('open'); }
+  function switchProfileTab(id, btn) {
+    const card = btn.closest('.profile-card');
+    card.querySelectorAll('.profile-tab-content').forEach(p => p.classList.remove('active'));
+    card.querySelectorAll('.profile-tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+  }
+  const stampImages = ['判子/赤メンバー.png', '判子/青メンバー.png', '判子/黄メンバー.png'];
+  document.getElementById('stamp-img').style.backgroundImage = `url('${stampImages[Math.floor(Math.random() * stampImages.length)]}')`;
+
+</script>
+</body>
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Links | 野心会</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #F2EEE5; --bg2: #E8E2D5; --bg3: #DDD7C8;
+      --border: #1a1a1a; --border-light: #C4B89A;
+      --text: #1a1a1a; --muted: #8B7355; --accent: #D4380D; --accent2: #B52D0A;
+      --gold: #C49A00; --radius: 4px; --shadow: 0 2px 8px rgba(0,0,0,0.10); --nav-h: 64px;
+    }
+    html { scroll-behavior: smooth; color-scheme: light; font-size: 17px; }
+    body { background: var(--bg); color: var(--text); font-family: 'Hiragino Kaku Gothic ProN','Hiragino Sans','Noto Sans JP',sans-serif; font-size: 15px; line-height: 1.7; }
+    a { color: var(--text); text-decoration: none; }
+    a:hover { color: var(--accent); }
+    img { max-width: 100%; display: block; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); }
+    .fade-in { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    nav { position: fixed; top: 0; left: 0; right: 0; height: 64px; background: #F2EEE5; border-bottom: 2px solid #1a1a1a; z-index: 1000; display: flex; flex-direction: row; align-items: center; justify-content: space-between; padding: 0 40px; }
+    .nav-logo { display: flex; flex-direction: row; align-items: center; gap: 10px; font-size: 1.1rem; font-weight: 900; color: #1a1a1a; text-decoration: none; letter-spacing: 0.04em; flex-shrink: 0; }
+    .nav-logo img { width: 56px; height: 56px; object-fit: contain; }
+    .nav-links { display: flex !important; flex-direction: row !important; align-items: center; gap: 24px; list-style: none; margin: 0; padding: 0; }
+    .nav-links li { display: flex; flex-direction: row; }
+    .nav-links a { color: #1a1a1a !important; font-size: 0.68rem; letter-spacing: 0.10em; text-transform: uppercase; font-weight: 700; transition: color 0.2s; white-space: nowrap; }
+    .nav-links a:hover, .nav-links a.active { color: #D4380D !important; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: #1a1a1a; transition: all 0.3s; }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .mobile-menu { display: none; position: fixed; top: 64px; left: 0; right: 0; background: #F2EEE5; border-bottom: 2px solid #1a1a1a; padding: 20px 32px; z-index: 999; flex-direction: column; gap: 0; }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { color: #8B7355; font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 12px 0; border-bottom: 1px solid #C4B89A; }
+
+    .page-header { padding: calc(var(--nav-h) + 56px) 40px 40px; max-width: 1100px; margin: 0 auto; border-bottom: 2px solid var(--border); position: relative; }
+    .page-label { font-size: 0.6rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 8px; display: block; }
+    .page-header h1 { font-size: clamp(2.4rem, 7vw, 4.5rem); font-weight: 900; line-height: 1.05; margin-bottom: 12px; }
+    .page-header p { font-size: 0.82rem; color: var(--muted); max-width: 400px; }
+    .stamp { display: inline-flex; align-items: center; justify-content: center; width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--accent); color: var(--accent); font-size: 0.68rem; font-weight: 700; transform: rotate(-15deg); text-align: center; line-height: 1.5; padding: 10px; position: absolute; right: 40px; top: calc(var(--nav-h) + 48px); }
+
+    section { padding: 56px 40px 72px; max-width: 1100px; margin: 0 auto; }
+    .section-label { font-size: 0.6rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 6px; display: block; }
+    .section-title { font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 900; line-height: 1.1; padding-bottom: 10px; border-bottom: 2px solid var(--border); display: inline-block; margin-bottom: 24px; }
+
+    /* Links Grid */
+    .links-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0; border: 2px solid var(--border); margin-bottom: -2px; }
+    .link-card { border-right: 2px solid var(--border); border-bottom: 2px solid var(--border); display: flex; flex-direction: column; transition: background 0.15s; }
+    .link-card:hover { background: var(--bg2); }
+    .link-card-header { padding: 8px 16px; background: var(--bg2); border-bottom: 1px solid var(--border-light); font-size: 0.58rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+    .link-card-body { padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+    .link-card-name { font-size: 1rem; font-weight: 900; line-height: 1.3; color: var(--text); }
+    .link-card-person { font-size: 0.68rem; color: var(--accent); font-weight: 700; letter-spacing: 0.06em; }
+    .link-card-desc { font-size: 0.72rem; color: var(--muted); line-height: 1.85; flex: 1; }
+    .link-card-btn { margin-top: 14px; display: inline-flex; align-items: center; gap: 6px; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 7px 14px; border: 1px solid var(--border); color: var(--text); transition: all 0.15s; align-self: flex-start; }
+    .link-card-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .link-card-btn::after { content: '↗'; }
+
+    footer { background: var(--text); border-top: 3px solid var(--accent); padding: 48px 40px 0; }
+    .footer-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: flex-start; justify-content: space-between; gap: 40px; flex-wrap: wrap; padding-bottom: 40px; }
+    .footer-brand { font-size: 1.5rem; font-weight: 900; color: var(--bg); margin-bottom: 6px; letter-spacing: 0.04em; }
+    .footer-tagline { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
+    .footer-nav { display: flex; flex-direction: column; gap: 10px; }
+    .footer-nav a { font-size: 0.65rem; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(242,238,229,0.5); transition: color 0.15s; }
+    .footer-nav a:hover { color: var(--bg); }
+    .footer-copy { max-width: 1100px; margin: 0 auto; border-top: 1px solid rgba(255,255,255,0.1); padding: 16px 0; font-size: 0.6rem; letter-spacing: 0.12em; color: rgba(242,238,229,0.3); }
+
+    @media (max-width: 480px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none !important; }
+      .hamburger { display: flex; }
+      section { padding: 40px 20px 56px; }
+      .page-header { padding-left: 20px; padding-right: 20px; }
+      .stamp { display: none; }
+      .links-grid { grid-template-columns: 1fr; }
+      footer { padding: 40px 20px 0; }
+      .footer-inner { flex-direction: column; gap: 24px; }
+    }
+  </style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo"><img src="赤アイコン.png" alt="野心会" />野心会</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Top</a></li>
+    <li><a href="members.html">Members</a></li>
+    <li><a href="activities.html">Activities</a></li>
+    <li><a href="join.html">Join</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="links.html" class="active">Links</a></li>
+  </ul>
+  <div class="hamburger" id="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html" onclick="closeMenu()">Top</a>
+  <a href="members.html" onclick="closeMenu()">Members</a>
+  <a href="activities.html" onclick="closeMenu()">Activities</a>
+  <a href="join.html" onclick="closeMenu()">Join</a>
+  <a href="contact.html" onclick="closeMenu()">Contact</a>
+  <a href="links.html" onclick="closeMenu()">Links</a>
+</div>
+
+<div class="page-header fade-in">
+  <span class="page-label">Links</span>
+  <h1>リンク集</h1>
+  <p>野心会に関わる登壇者・団体・コミュニティのサイトをまとめています。</p>
+  <div class="stamp">LINKS<br>集</div>
+</div>
+
+<section class="fade-in">
+
+  <!-- 登壇者・関係者 -->
+  <span class="section-label">Speakers</span>
+  <h2 class="section-title">登壇者・関係者</h2>
+  <div class="links-grid">
+
+    <a href="https://www.canvas.co.jp/company/" target="_blank" class="link-card">
+      <div class="link-card-header">Company</div>
+      <div class="link-card-body">
+        <div class="link-card-name">株式会社Canvas</div>
+        <div class="link-card-person">元廣 惇</div>
+        <div class="link-card-desc">言語聴覚士・理学療法士・作業療法士の専門家集団。医療・介護・教育分野へのアプローチを行う。</div>
+        <span class="link-card-btn">サイトを見る</span>
+      </div>
+    </a>
+
+    <a href="https://weave-co.jp/" target="_blank" class="link-card">
+      <div class="link-card-header">Company</div>
+      <div class="link-card-body">
+        <div class="link-card-name">株式会社Weave</div>
+        <div class="link-card-person">元廣 惇</div>
+        <div class="link-card-desc">リハビリテーション領域における研究・教育・事業開発を手がける。</div>
+        <span class="link-card-btn">サイトを見る</span>
+      </div>
+    </a>
+
+    <a href="https://zyoshu.co.jp/" target="_blank" class="link-card">
+      <div class="link-card-header">Company</div>
+      <div class="link-card-body">
+        <div class="link-card-name">株式会社ジョシュ</div>
+        <div class="link-card-person">永島 匡</div>
+        <div class="link-card-desc">AI&DXを活用した医療介護情報連携SaaSプラットフォーム「連携ジョシュ」を展開。2024年設立。</div>
+        <span class="link-card-btn">サイトを見る</span>
+      </div>
+    </a>
+
+    <a href="https://corp.digireha.com/" target="_blank" class="link-card">
+      <div class="link-card-header">Company</div>
+      <div class="link-card-body">
+        <div class="link-card-name">株式会社デジリハ</div>
+        <div class="link-card-person">大松 聡子</div>
+        <div class="link-card-desc">デジタルゲームを活用したリハビリテーションの研究・開発を行うヘルステック企業。</div>
+        <span class="link-card-btn">サイトを見る</span>
+      </div>
+    </a>
+
+    <a href="https://www.igaku-shoin.co.jp/" target="_blank" class="link-card">
+      <div class="link-card-header">Publisher</div>
+      <div class="link-card-body">
+        <div class="link-card-name">株式会社医学書院</div>
+        <div class="link-card-person">小段 裕太</div>
+        <div class="link-card-desc">医学・看護・リハビリテーション分野の専門書・雑誌を手がける日本最大級の医学専門出版社。</div>
+        <span class="link-card-btn">サイトを見る</span>
+      </div>
+    </a>
+
+    <a href="https://www.kio.ac.jp/nrc/" target="_blank" class="link-card">
+      <div class="link-card-header">Research</div>
+      <div class="link-card-body">
+        <div class="link-card-name">畿央大学<br>ニューロリハビリテーション研究センター</div>
+        <div class="link-card-person">大松 聡子</div>
+        <div class="link-card-desc">脳科学とリハビリテーションの融合研究を行う研究センター。</div>
+        <span class="link-card-btn">サイトを見る</span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- 学会・コミュニティ -->
+  <span class="section-label" style="margin-top:56px;display:block;">Community & Academic</span>
+  <h2 class="section-title">学会・コミュニティ</h2>
+  <div class="links-grid">
+
+    <a href="http://jscot.kenkyuukai.jp/special/?id=9258" target="_blank" class="link-card">
+      <div class="link-card-header">Academic Society</div>
+      <div class="link-card-body">
+        <div class="link-card-name">日本臨床作業療法学会（JSCOT）</div>
+        <div class="link-card-desc">臨床作業療法の発展を目的とした学会。野心会第3回スペースとのコラボ企画を実施。会員募集中。</div>
+        <span class="link-card-btn">サイトを見る</span>
+      </div>
+    </a>
+
+    <a href="https://www.pt-ot-st.net/" target="_blank" class="link-card">
+      <div class="link-card-header">Media</div>
+      <div class="link-card-body">
+        <div class="link-card-name">PT・OT・ST.net</div>
+        <div class="link-card-desc">理学療法士・作業療法士・言語聴覚士向けの総合情報サイト。求人・コラム・勉強会情報を掲載。</div>
+        <span class="link-card-btn">サイトを見る</span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- researchmap -->
+  <span class="section-label" style="margin-top:56px;display:block;">Research</span>
+  <h2 class="section-title">研究者プロフィール</h2>
+  <div class="links-grid">
+
+    <a href="https://researchmap.jp/A-motohiro" target="_blank" class="link-card">
+      <div class="link-card-header">researchmap</div>
+      <div class="link-card-body">
+        <div class="link-card-name">元廣 惇</div>
+        <div class="link-card-desc">researchmapにて研究業績・論文・学会発表を公開中。</div>
+        <span class="link-card-btn">プロフィールを見る</span>
+      </div>
+    </a>
+
+    <a href="https://researchmap.jp/polaresfid" target="_blank" class="link-card">
+      <div class="link-card-header">researchmap</div>
+      <div class="link-card-body">
+        <div class="link-card-name">大松 聡子</div>
+        <div class="link-card-desc">researchmapにて研究業績・論文・学会発表を公開中。専門：半側空間無視・デジタルリハビリテーション。</div>
+        <span class="link-card-btn">プロフィールを見る</span>
+      </div>
+    </a>
+
+    <a href="https://researchmap.jp/nagoya_708" target="_blank" class="link-card">
+      <div class="link-card-header">researchmap</div>
+      <div class="link-card-body">
+        <div class="link-card-name">庵本 直矢</div>
+        <div class="link-card-desc">researchmapにて研究業績・論文・学会発表を公開中。専門：脳卒中後上肢機能障害・脳画像。</div>
+        <span class="link-card-btn">プロフィールを見る</span>
+      </div>
+    </a>
+
+  </div>
+
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div><div class="footer-brand">野心会</div><div class="footer-tagline">Yashinkai — Community of Ambition</div></div>
+    <div class="footer-nav">
+      <a href="index.html">Top</a>
+      <a href="members.html">Members</a>
+      <a href="activities.html">Activities</a>
+      <a href="join.html">Join</a>
+      <a href="contact.html">Contact</a>
+      <a href="links.html">Links</a>
+    </div>
+  </div>
+  <div class="footer-copy">&copy; 2026 野心会 All Rights Reserved.</div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver(e => e.forEach(x => { if(x.isIntersecting) x.target.classList.add('visible'); }), {threshold:0.1});
+  document.querySelectorAll('.fade-in').forEach(el => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      el.classList.add('visible');
+    } else {
+      observer.observe(el);
+    }
+  });
+  function toggleMenu(){ document.getElementById('mobileMenu').classList.toggle('open'); document.getElementById('hamburger').classList.toggle('open'); }
+  function closeMenu(){ document.getElementById('mobileMenu').classList.remove('open'); document.getElementById('hamburger').classList.remove('open'); }
+</script>
+</body>
+</html>

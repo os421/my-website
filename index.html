@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>野心会</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #F2EEE5; --bg2: #E8E2D5; --bg3: #DDD7C8;
+      --border: #1a1a1a; --border-light: #C4B89A;
+      --text: #1a1a1a; --muted: #8B7355; --accent: #D4380D; --accent2: #B52D0A;
+      --gold: #C49A00; --radius: 4px; --shadow: 0 2px 8px rgba(0,0,0,0.10); --nav-h: 64px;
+      color-scheme: light;
+    }
+    html { scroll-behavior: smooth; color-scheme: light; font-size: 17px; }
+    body { background: var(--bg); color: var(--text); font-family: 'Hiragino Kaku Gothic ProN','Hiragino Sans','Noto Sans JP',sans-serif; font-size: 15px; line-height: 1.7; }
+    a { color: var(--text); text-decoration: none; }
+    a:hover { color: var(--accent); }
+    img { max-width: 100%; display: block; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); }
+
+    .fade-in { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    /* ===== Loader ===== */
+    #loader { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.7s ease; }
+    #loader.hide { opacity: 0; pointer-events: none; }
+    .loader-icon-wrap { position: relative; width: 300px; height: 300px; margin-bottom: 32px; }
+    .loader-icon-base { width: 100%; height: 100%; object-fit: contain; opacity: 0.12; display: block; }
+    .loader-icon-reveal { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; clip-path: inset(100% 0 0 0); }
+    .loader-bar-wrap { width: 200px; height: 3px; background: var(--bg3); border-radius: 100px; }
+    .loader-bar { height: 100%; width: 0%; background: var(--accent); transition: none; border-radius: 100px; }
+
+    /* ===== Nav ===== */
+    nav { position: fixed; top: 0; left: 0; right: 0; height: 64px; background: #F2EEE5; border-bottom: 2px solid #1a1a1a; z-index: 1000; display: flex; flex-direction: row; align-items: center; justify-content: space-between; padding: 0 40px; }
+    .nav-logo { display: flex; flex-direction: row; align-items: center; gap: 10px; font-size: 1.1rem; font-weight: 900; color: #1a1a1a; text-decoration: none; letter-spacing: 0.04em; flex-shrink: 0; }
+    .nav-logo img { width: 56px; height: 56px; object-fit: contain; }
+    .nav-links { display: flex !important; flex-direction: row !important; align-items: center; gap: 24px; list-style: none; margin: 0; padding: 0; }
+    .nav-links li { display: flex; flex-direction: row; }
+    .nav-links a { color: #1a1a1a !important; font-size: 0.68rem; letter-spacing: 0.10em; text-transform: uppercase; font-weight: 700; transition: color 0.2s; white-space: nowrap; }
+    .nav-links a:hover, .nav-links a.active { color: #D4380D !important; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: #1a1a1a; transition: all 0.3s; }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .mobile-menu { display: none; position: fixed; top: 64px; left: 0; right: 0; background: #F2EEE5; border-bottom: 2px solid #1a1a1a; padding: 20px 32px; z-index: 999; flex-direction: column; gap: 0; }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { color: #8B7355; font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 12px 0; border-bottom: 1px solid #C4B89A; }
+
+    /* ===== Hero ===== */
+    #home { min-height: 100vh; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding: calc(var(--nav-h) + 60px) 40px 80px; position: relative; overflow: hidden; border-bottom: 2px solid var(--border); }
+    .hero-badge { display: inline-block; padding: 4px 14px; margin-bottom: 24px; border: 2px solid var(--accent); color: var(--accent); font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase; font-weight: 700; }
+    .hero-title { font-size: clamp(5rem, 14vw, 11rem); font-weight: 900; line-height: 0.92; letter-spacing: -0.03em; color: var(--text); margin-bottom: 28px; }
+    .hero-title-sub { font-size: clamp(0.9rem, 2.5vw, 1.5rem); font-weight: 900; letter-spacing: -0.02em; color: var(--text); margin-bottom: 28px; line-height: 1; }
+    .hero-sub { font-size: 0.85rem; color: var(--muted); max-width: 380px; margin-bottom: 40px; line-height: 1.9; }
+    .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+    .hero-stamp { position: absolute; right: 60px; top: 50%; transform: translateY(-50%) rotate(-12deg); width: 120px; height: 120px; border-radius: 50%; border: 2px solid var(--accent); color: var(--accent); display: flex; align-items: center; justify-content: center; text-align: center; font-size: 0.72rem; letter-spacing: 0.12em; font-weight: 700; line-height: 1.7; padding: 16px; }
+
+    /* ===== Buttons ===== */
+    .btn { display: inline-block; padding: 10px 24px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; border-radius: var(--radius); }
+    .btn-primary { background: var(--accent); color: #fff; border: 2px solid var(--accent); }
+    .btn-primary:hover { background: var(--accent2); border-color: var(--accent2); color: #fff; text-decoration: none; }
+    .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text); }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
+
+    /* ===== Divider ===== */
+    .divider { height: 2px; background: var(--border); max-width: 1100px; margin: 0 auto; }
+
+    /* ===== Section ===== */
+    section { padding: 72px 40px 80px; max-width: 1100px; margin: 0 auto; }
+    .section-label { font-size: 0.6rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 6px; display: block; }
+    .section-title { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 900; line-height: 1.1; padding-bottom: 10px; border-bottom: 2px solid var(--border); display: inline-block; margin-bottom: 0; }
+    .section-desc { font-size: 0.82rem; color: var(--muted); max-width: 480px; margin-top: 16px; margin-bottom: 40px; line-height: 1.9; }
+    .about-subtitle { font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin-top: 10px; }
+
+    /* ===== About ===== */
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 2px solid var(--border); margin-bottom: 16px; }
+    .about-block { padding: 32px; }
+    .about-block:first-child { border-right: 2px solid var(--border); }
+    .about-block h3 { font-size: 0.95rem; font-weight: 800; margin-bottom: 12px; color: var(--accent); letter-spacing: 0.04em; }
+    .about-block p { font-size: 0.8rem; color: var(--muted); line-height: 1.95; }
+    .about-accent { margin-top: 16px; padding: 12px 16px; border-left: 3px solid var(--accent); background: var(--bg2); font-size: 0.8rem !important; color: var(--text) !important; font-weight: 700; line-height: 1.85 !important; }
+    .about-belief { font-size: clamp(1.2rem, 2.8vw, 1.8rem) !important; font-weight: 900; color: var(--text) !important; line-height: 1.4 !important; margin-bottom: 16px; }
+    .about-strong { font-size: 0.9rem; font-weight: 900; color: var(--text); letter-spacing: 0.02em; }
+    .about-belief-accent { color: var(--accent); }
+
+    /* ===== Cards ===== */
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: 2px solid var(--border); }
+    .card { padding: 28px; border-right: 2px solid var(--border); transition: background 0.15s; }
+    .card:last-child { border-right: none; }
+    .card:hover { background: var(--bg2); }
+    .card-icon { font-size: 1.4rem; margin-bottom: 14px; }
+    .card-title { font-size: 0.95rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.02em; }
+    .card-body { font-size: 0.78rem; color: var(--muted); line-height: 1.85; }
+
+    /* ===== Features ===== */
+    .features { margin-top: 40px; border: 2px solid var(--border); }
+    .features-title { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); padding: 12px 20px; border-bottom: 2px solid var(--border); background: var(--bg2); }
+    .features-list { list-style: none; }
+    .features-list li { display: flex; align-items: baseline; gap: 20px; padding: 14px 20px; border-bottom: 1px solid var(--border-light); }
+    .features-list li:last-child { border-bottom: none; }
+    .features-label { font-size: 0.78rem; font-weight: 900; color: var(--text); white-space: nowrap; min-width: 180px; flex-shrink: 0; }
+    .features-label::after { content: ' —'; color: var(--accent); }
+    .features-body { font-size: 0.78rem; color: var(--muted); line-height: 1.85; }
+
+    /* ===== News ===== */
+    .news-list { border: 2px solid var(--border); }
+    .news-item { padding: 14px 20px; display: flex; align-items: flex-start; gap: 16px; border-bottom: 1px solid var(--border-light); transition: background 0.15s; }
+    .news-item:last-child { border-bottom: none; }
+    .news-item:hover { background: var(--bg2); }
+    .news-date { font-size: 0.62rem; letter-spacing: 0.1em; color: var(--muted); white-space: nowrap; padding-top: 2px; min-width: 72px; }
+    .news-tag { font-size: 0.58rem; padding: 2px 8px; border: 1px solid var(--accent); color: var(--accent); white-space: nowrap; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; flex-shrink: 0; }
+    .news-title-text { font-size: 0.82rem; }
+
+    /* ===== FAQ ===== */
+    .faq-list { border: 2px solid var(--border); }
+    .faq-item { border-bottom: 1px solid var(--border-light); }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-question { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 24px; cursor: pointer; list-style: none; font-size: 0.88rem; font-weight: 800; line-height: 1.5; transition: background 0.15s; }
+    .faq-question::-webkit-details-marker { display: none; }
+    .faq-question:hover { background: var(--bg2); }
+    .faq-question::after { content: '+'; font-size: 1.2rem; font-weight: 900; color: var(--accent); flex-shrink: 0; transition: transform 0.2s; }
+    details[open] > .faq-question { background: var(--bg2); }
+    details[open] > .faq-question::after { content: '−'; }
+    .faq-answer { padding: 0 24px 18px 24px; font-size: 0.78rem; color: var(--muted); line-height: 1.95; }
+    .faq-q-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.18em; color: var(--accent); margin-right: 10px; }
+
+    /* ===== Footer ===== */
+    footer { background: var(--text); border-top: 3px solid var(--accent); padding: 48px 40px 0; }
+    .footer-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: flex-start; justify-content: space-between; gap: 40px; flex-wrap: wrap; padding-bottom: 40px; }
+    .footer-brand { font-size: 1.5rem; font-weight: 900; color: var(--bg); margin-bottom: 6px; letter-spacing: 0.04em; }
+    .footer-tagline { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
+    .footer-nav { display: flex; flex-direction: column; gap: 10px; }
+    .footer-nav a { font-size: 0.65rem; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(242,238,229,0.5); transition: color 0.15s; }
+    .footer-nav a:hover { color: var(--bg); }
+    .footer-copy { max-width: 1100px; margin: 0 auto; border-top: 1px solid rgba(255,255,255,0.1); padding: 16px 0; font-size: 0.6rem; letter-spacing: 0.12em; color: rgba(242,238,229,0.3); }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 480px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none !important; }
+      .hamburger { display: flex; }
+      section { padding: 48px 20px 60px; }
+      #home { padding-left: 20px; padding-right: 20px; align-items: center; text-align: center; }
+      .hero-stamp { display: none; }
+      .hero-sub { margin: 0 auto 32px; }
+      .hero-btns { justify-content: center; }
+      .about-grid { grid-template-columns: 1fr; }
+      .about-block:first-child { border-right: none; border-bottom: 2px solid var(--border); }
+      .cards { grid-template-columns: 1fr; }
+      .card { border-right: none; border-bottom: 2px solid var(--border); }
+      .card:last-child { border-bottom: none; }
+      footer { padding: 40px 20px 0; }
+      .footer-inner { flex-direction: column; gap: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== Loader ===== -->
+<div id="loader">
+  <div class="loader-icon-wrap">
+    <img src="赤アイコン.png" alt="" class="loader-icon-base" />
+    <img src="赤アイコン.png" alt="" class="loader-icon-reveal" id="loaderIcon" />
+  </div>
+  <div class="loader-bar-wrap">
+    <div class="loader-bar" id="loaderBar"></div>
+  </div>
+</div>
+
+<!-- ===== Nav ===== -->
+<nav>
+  <a href="index.html" class="nav-logo"><img src="赤アイコン.png" alt="野心会" />野心会</a>
+  <ul class="nav-links">
+    <li><a href="index.html" class="active">Top</a></li>
+    <li><a href="members.html">Members</a></li>
+    <li><a href="activities.html">Activities</a></li>
+    <li><a href="join.html">Join</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <div class="hamburger" id="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html" onclick="closeMenu()">Top</a>
+  <a href="members.html" onclick="closeMenu()">Members</a>
+  <a href="activities.html" onclick="closeMenu()">Activities</a>
+  <a href="join.html" onclick="closeMenu()">Join</a>
+  <a href="contact.html" onclick="closeMenu()">Contact</a>
+</div>
+
+<!-- ===== Hero ===== -->
+<section id="home" style="padding:0;margin:0;max-width:none;position:relative;overflow:hidden;">
+  <img src="トップページ.png" alt="野心会" style="width:100vw;height:calc(100vh - 64px);display:block;object-fit:cover;object-position:center top;margin-left:calc(50% - 50vw);margin-top:64px;" />
+</section>
+
+<div class="divider"></div>
+
+<!-- ===== About ===== -->
+<section id="about">
+  <div class="fade-in">
+    <span class="section-label">About</span>
+    <h2 class="section-title">野心会とは</h2>
+  </div>
+
+  <div class="about-grid fade-in">
+    <div class="about-block">
+      <h3>野心の語源</h3>
+      <p>「野心」の言葉は、中国の史書『春秋左氏伝』にある「狼子野心」に由来する。狼の子は人に育てられても飼い主に仇をなす——つまり、生まれ持った性質は変えられないという意味だ。元来「野心」とは、飼い慣らされることを拒む荒々しい魂であり、他者を押しのけてでも上へと昇ろうとする、力強い意志のことであった。</p>
+      <p class="about-accent">現在ではチャレンジ精神を生み、自分を高める行動や意欲的な姿勢を指す——そんな、前向きな力の象徴として使われている。</p>
+    </div>
+    <div class="about-block">
+      <h3>理念</h3>
+      <p class="about-belief">明日から、<br><span class="about-belief-accent">ちょっとだけ</span><br>チャレンジしてみよう。</p>
+      <p>「明日からちょっとチャレンジしてみよう」と思えるような場にしたい——それが野心会の出発点です。<br><strong class="about-strong">野心とは、決して難しいことではありません。</strong><br><strong class="about-strong">まず一歩、踏み出す意志のことです。</strong></p>
+    </div>
+  </div>
+
+  <div class="features fade-in">
+    <h3 class="features-title">特性</h3>
+    <ul class="features-list">
+      <li>
+        <span class="features-label">開かれた学びの場</span>
+        <span class="features-body">若手から中堅・ベテランまで、キャリアを問わず参加できるスペース設計</span>
+      </li>
+      <li>
+        <span class="features-label">多様なゲスト登用</span>
+        <span class="features-body">学会理事・海外実践者・異業種専門家を招き、業界の視野を広げる</span>
+      </li>
+      <li>
+        <span class="features-label">実務直結テーマ</span>
+        <span class="features-body">「研究費の獲得方法」「協会理事を目指す理由」など、すぐに使えるノウハウを共有</span>
+      </li>
+      <li>
+        <span class="features-label">SNSネイティブなコミュニティ</span>
+        <span class="features-body">場所や時間を問わず、全国の療法士が繋がれる設計</span>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ===== News ===== -->
+<section id="news">
+  <div class="fade-in">
+    <span class="section-label">News</span>
+    <h2 class="section-title">最新情報</h2>
+    <p class="section-desc" style="margin-bottom:28px;">野心会の最新ニュースやイベント情報をお届けします。</p>
+  </div>
+  <div class="news-list fade-in">
+    <div class="news-item">
+      <span class="news-date">2026.04.02</span>
+      <span class="news-tag">Space</span>
+      <span class="news-title-text">第39回 野心会スペース開催決定 ── 4月2日（木）21:00〜</span>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ===== FAQ ===== -->
+<section id="faq">
+  <div class="fade-in">
+    <span class="section-label">FAQ</span>
+    <h2 class="section-title">よくある質問</h2>
+    <p class="section-desc">野心会についてよくいただく質問をまとめました。</p>
+  </div>
+  <div class="faq-list fade-in">
+    <details class="faq-item">
+      <summary class="faq-question"><span><span class="faq-q-label">Q</span>どうやって参加するの？</span></summary>
+      <p class="faq-answer">X（旧Twitter）のスペース機能を通じて参加できます。共同創設者のアカウント（<a href="https://twitter.com/bc7_ot" target="_blank" style="color:var(--accent);">@bc7_ot</a>・<a href="https://twitter.com/OkitaYuho" target="_blank" style="color:var(--accent);">@OkitaYuho</a>・<a href="https://twitter.com/naoya_758" target="_blank" style="color:var(--accent);">@naoya_758</a>）をフォローし、スペース開催の告知をお待ちください。詳しい参加手順は <a href="join.html" style="color:var(--accent);font-weight:700;">Joinページ</a> をご覧ください。</p>
+    </details>
+    <details class="faq-item">
+      <summary class="faq-question"><span><span class="faq-q-label">Q</span>参加に費用はかかりますか？</span></summary>
+      <p class="faq-answer">無料です。スペースへの参加・聴講に一切費用はかかりません。</p>
+    </details>
+    <details class="faq-item">
+      <summary class="faq-question"><span><span class="faq-q-label">Q</span>匿名で参加できますか？</span></summary>
+      <p class="faq-answer">はい、リスナーとしての参加は匿名でも可能です。マイクはデフォルトでオフのため、聴くだけの参加も歓迎しています。</p>
+    </details>
+    <details class="faq-item">
+      <summary class="faq-question"><span><span class="faq-q-label">Q</span>Xのアカウントがなくても参加できますか？</span></summary>
+      <p class="faq-answer">アーカイブが残っているスペースはアカウントなしでも聴取できる場合があります。リアルタイムでの参加にはXアカウントが必要です。</p>
+    </details>
+    <details class="faq-item">
+      <summary class="faq-question"><span><span class="faq-q-label">Q</span>次回の開催情報はどこで確認できますか？</span></summary>
+      <p class="faq-answer">共同創設者のXアカウント（<a href="https://twitter.com/bc7_ot" target="_blank" style="color:var(--accent);">@bc7_ot</a>・<a href="https://twitter.com/OkitaYuho" target="_blank" style="color:var(--accent);">@OkitaYuho</a>・<a href="https://twitter.com/naoya_758" target="_blank" style="color:var(--accent);">@naoya_758</a>）またはハッシュタグ <strong>#野心会</strong> でご確認ください。</p>
+    </details>
+    <details class="faq-item">
+      <summary class="faq-question"><span><span class="faq-q-label">Q</span>作業療法士以外でも参加できますか？</span></summary>
+      <p class="faq-answer">はい、どなたでも参加できます。野心を持つすべての方に開かれたコミュニティです。</p>
+    </details>
+    <details class="faq-item">
+      <summary class="faq-question"><span><span class="faq-q-label">Q</span>学生でも参加できますか？</span></summary>
+      <p class="faq-answer">はい、学生の参加も大歓迎です。キャリアや学年を問わず、挑戦する意志のある方ならどなたでも参加できます。</p>
+    </details>
+    <details class="faq-item">
+      <summary class="faq-question"><span><span class="faq-q-label">Q</span>登壇したいのですが、どうすればよいですか？</span></summary>
+      <p class="faq-answer"><a href="contact.html" style="color:var(--accent);font-weight:700;">Contactページ</a> またはXのDMにてお気軽にご連絡ください。</p>
+    </details>
+    <details class="faq-item">
+      <summary class="faq-question"><span><span class="faq-q-label">Q</span>野心会はどんな人が運営していますか？</span></summary>
+      <p class="faq-answer">作業療法士の小渕 浩平・沖田 勇帆・庵本 直矢の3名が共同創設者として運営しています。詳しくは <a href="members.html" style="color:var(--accent);font-weight:700;">Membersページ</a> をご覧ください。</p>
+    </details>
+    <details class="faq-item">
+      <summary class="faq-question"><span><span class="faq-q-label">Q</span>過去のスペースは聴けますか？</span></summary>
+      <p class="faq-answer">一部のスペースはアーカイブとして残っています。<a href="activities.html" style="color:var(--accent);font-weight:700;">Activitiesページ</a> よりご確認ください。</p>
+    </details>
+  </div>
+</section>
+
+<!-- ===== Footer ===== -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">野心会</div>
+      <div class="footer-tagline">Yashinkai — Community of Ambition</div>
+    </div>
+    <div class="footer-nav">
+      <a href="index.html">Top</a>
+      <a href="members.html">Members</a>
+      <a href="activities.html">Activities</a>
+      <a href="join.html">Join</a>
+    </div>
+  </div>
+  <div class="footer-copy">&copy; 2026 野心会 All Rights Reserved.</div>
+</footer>
+
+<script>
+  // Loader
+  (function () {
+    const icons = ['赤アイコン.png', '青アイコン.png', '黄アイコン.png'];
+    const picked = icons[Math.floor(Math.random() * icons.length)];
+    document.querySelectorAll('.loader-icon-base, .loader-icon-reveal, .nav-logo img').forEach(el => el.src = picked);
+    const loader = document.getElementById('loader');
+    const icon = document.getElementById('loaderIcon');
+    const bar = document.getElementById('loaderBar');
+    let progress = 0;
+    const duration = 2000;
+    const interval = 16;
+    const step = 100 / (duration / interval);
+    const timer = setInterval(() => {
+      progress = Math.min(progress + step, 100);
+      icon.style.clipPath = 'inset(' + (100 - progress) + '% 0 0 0)';
+      if (bar) bar.style.width = progress + '%';
+      if (progress >= 100) {
+        clearInterval(timer);
+        setTimeout(() => { loader.classList.add('hide'); setTimeout(() => loader.remove(), 750); }, 300);
+      }
+    }, interval);
+  })();
+
+  // Fade-in
+  const observer = new IntersectionObserver(e => e.forEach(x => { if (x.isIntersecting) x.target.classList.add('visible'); }), { threshold: 0.1 });
+  document.querySelectorAll('.fade-in').forEach(el => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      el.classList.add('visible');
+    } else {
+      observer.observe(el);
+    }
+  });
+
+  // Mobile menu
+  function toggleMenu() { document.getElementById('mobileMenu').classList.toggle('open'); document.getElementById('hamburger').classList.toggle('open'); }
+  function closeMenu() { document.getElementById('mobileMenu').classList.remove('open'); document.getElementById('hamburger').classList.remove('open'); }
+</script>
+</body>
+</html>

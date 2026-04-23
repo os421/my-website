@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>お問い合わせ | 野心会</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #F2EEE5; --bg2: #E8E2D5; --bg3: #DDD7C8;
+      --border: #1a1a1a; --border-light: #C4B89A;
+      --text: #1a1a1a; --muted: #8B7355; --accent: #D4380D; --accent2: #B52D0A;
+      --gold: #C49A00; --radius: 4px; --shadow: 0 2px 8px rgba(0,0,0,0.10); --nav-h: 64px;
+    }
+    html { scroll-behavior: smooth; color-scheme: light; font-size: 17px; }
+    body { background: var(--bg); color: var(--text); font-family: 'Hiragino Kaku Gothic ProN','Hiragino Sans','Noto Sans JP',sans-serif; font-size: 15px; line-height: 1.7; }
+    a { color: var(--text); text-decoration: none; }
+    a:hover { color: var(--accent); }
+    img { max-width: 100%; display: block; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); }
+    .fade-in { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    nav { position: fixed; top: 0; left: 0; right: 0; height: 64px; background: #F2EEE5; border-bottom: 2px solid #1a1a1a; z-index: 1000; display: flex; flex-direction: row; align-items: center; justify-content: space-between; padding: 0 40px; }
+    .nav-logo { display: flex; flex-direction: row; align-items: center; gap: 10px; font-size: 1.1rem; font-weight: 900; color: #1a1a1a; text-decoration: none; letter-spacing: 0.04em; flex-shrink: 0; }
+    .nav-logo img { width: 56px; height: 56px; object-fit: contain; }
+    .nav-links { display: flex !important; flex-direction: row !important; align-items: center; gap: 24px; list-style: none; margin: 0; padding: 0; }
+    .nav-links li { display: flex; flex-direction: row; }
+    .nav-links a { color: #1a1a1a !important; font-size: 0.68rem; letter-spacing: 0.10em; text-transform: uppercase; font-weight: 700; transition: color 0.2s; white-space: nowrap; }
+    .nav-links a:hover, .nav-links a.active { color: #D4380D !important; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: #1a1a1a; transition: all 0.3s; }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .mobile-menu { display: none; position: fixed; top: 64px; left: 0; right: 0; background: #F2EEE5; border-bottom: 2px solid #1a1a1a; padding: 20px 32px; z-index: 999; flex-direction: column; gap: 0; }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { color: #8B7355; font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 12px 0; border-bottom: 1px solid #C4B89A; }
+
+    .page-header { padding: calc(var(--nav-h) + 56px) 40px 40px; max-width: 1100px; margin: 0 auto; border-bottom: 2px solid var(--border); position: relative; }
+    .page-label { font-size: 0.6rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 8px; display: block; }
+    .page-header h1 { font-size: clamp(2.4rem, 7vw, 4.5rem); font-weight: 900; line-height: 1.05; margin-bottom: 12px; }
+    .page-header p { font-size: 0.82rem; color: var(--muted); max-width: 400px; }
+    .stamp { width: 220px; height: 220px; background-color: transparent; background-size: contain; background-repeat: no-repeat; background-position: center; position: absolute; right: 40px; top: calc(var(--nav-h) - 10px); }
+
+    section { padding: 56px 40px 72px; max-width: 1100px; margin: 0 auto; }
+
+    .contact-block { border: 2px solid var(--border); }
+    .contact-section { padding: 36px; border-bottom: 2px solid var(--border); }
+    .contact-section:last-child { border-bottom: none; }
+    .contact-section h3 { font-size: 1rem; font-weight: 800; margin-bottom: 14px; letter-spacing: 0.02em; }
+    .contact-section p { font-size: 0.78rem; color: var(--muted); margin-bottom: 20px; line-height: 1.9; }
+
+    .contact-form { display: flex; flex-direction: column; gap: 8px; }
+    .contact-form input, .contact-form textarea, .contact-form select { background: var(--bg); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 10px 12px; color: var(--text); font-size: 0.78rem; font-family: inherit; width: 100%; resize: vertical; transition: border-color 0.15s; appearance: none; }
+    .contact-form input:focus, .contact-form textarea:focus, .contact-form select:focus { outline: none; border-color: var(--accent); }
+    .contact-form textarea { min-height: 120px; }
+    .btn { display: inline-block; padding: 10px 24px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; border-radius: var(--radius); }
+    .btn-primary { background: var(--accent); color: #fff; border: 2px solid var(--accent); }
+    .btn-primary:hover { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+
+    .sns-list { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--border-light); }
+    .sns-item { display: flex; align-items: center; gap: 16px; padding: 14px 18px; border-bottom: 1px solid var(--border-light); font-size: 0.78rem; }
+    .sns-item:last-child { border-bottom: none; }
+    .sns-name { font-weight: 700; min-width: 80px; }
+    .sns-handle a { color: var(--accent); }
+
+    footer { background: var(--text); border-top: 3px solid var(--accent); padding: 48px 40px 0; }
+    .footer-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: flex-start; justify-content: space-between; gap: 40px; flex-wrap: wrap; padding-bottom: 40px; }
+    .footer-brand { font-size: 1.5rem; font-weight: 900; color: var(--bg); margin-bottom: 6px; letter-spacing: 0.04em; }
+    .footer-tagline { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
+    .footer-nav { display: flex; flex-direction: column; gap: 10px; }
+    .footer-nav a { font-size: 0.65rem; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(242,238,229,0.5); transition: color 0.15s; }
+    .footer-nav a:hover { color: var(--bg); }
+    .footer-copy { max-width: 1100px; margin: 0 auto; border-top: 1px solid rgba(255,255,255,0.1); padding: 16px 0; font-size: 0.6rem; letter-spacing: 0.12em; color: rgba(242,238,229,0.3); }
+
+    @media (max-width: 480px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none !important; }
+      .hamburger { display: flex; }
+      section { padding: 40px 20px 56px; }
+      .page-header { padding-left: 20px; padding-right: 20px; }
+      .stamp { display: none; }
+      .contact-section { padding: 24px 20px; }
+      footer { padding: 40px 20px 0; }
+      .footer-inner { flex-direction: column; gap: 24px; }
+    }
+  </style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo"><img src="赤アイコン.png" alt="野心会" />野心会</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Top</a></li>
+    <li><a href="members.html">Members</a></li>
+    <li><a href="activities.html">Activities</a></li>
+    <li><a href="join.html">Join</a></li>
+    <li><a href="contact.html" class="active">Contact</a></li>
+  </ul>
+  <div class="hamburger" id="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html" onclick="closeMenu()">Top</a>
+  <a href="members.html" onclick="closeMenu()">Members</a>
+  <a href="activities.html" onclick="closeMenu()">Activities</a>
+  <a href="join.html" onclick="closeMenu()">Join</a>
+  <a href="contact.html" onclick="closeMenu()">Contact</a>
+</div>
+
+<div class="page-header">
+  <div class="fade-in">
+    <span class="page-label">Contact</span>
+    <h1>お問い合わせ</h1>
+    <p>登壇・講演依頼、コンサルのご相談、コミュニティへのご質問など、お気軽にどうぞ。</p>
+  </div>
+  <div id="stamp-img" class="stamp"></div>
+</div>
+
+<section class="fade-in">
+  <div class="contact-block">
+    <div class="contact-section">
+      <h3>✉️ お問い合わせフォーム</h3>
+      <p>コミュニティへの質問など、お気軽にメッセージをお送りください。</p>
+      <form class="contact-form" onsubmit="submitForm(event)">
+        <input type="text" placeholder="お名前" required />
+        <input type="email" placeholder="メールアドレス" required />
+        <select required>
+          <option value="" disabled selected>お問い合わせの種別を選択してください</option>
+          <option value="登壇・講演依頼">・登壇・講演依頼</option>
+          <option value="研究協力">・研究協力</option>
+          <option value="ワークショップ＆教育">・ワークショップ＆教育</option>
+          <option value="実践教育">・実践教育</option>
+          <option value="その他">・その他</option>
+        </select>
+        <textarea placeholder="メッセージ内容をご記入ください"></textarea>
+        <button type="submit" class="btn btn-primary" style="border:none;cursor:pointer;">送信する</button>
+      </form>
+      <div id="form-success" style="display:none;margin-top:12px;color:var(--accent);font-size:0.78rem;letter-spacing:0.08em;">✅ お問い合わせを受け付けました。後日ご連絡いたします。</div>
+    </div>
+    <div class="contact-section">
+      <h3>🐦 SNSからも連絡できます</h3>
+      <p>X（旧Twitter）のDMでもお気軽にご連絡ください。</p>
+      <div class="sns-list">
+        <div class="sns-item">
+          <span class="sns-name">小渕 浩平</span>
+          <span class="sns-handle"><a href="https://twitter.com/bc7_ot" target="_blank">@bc7_ot</a></span>
+        </div>
+        <div class="sns-item">
+          <span class="sns-name">沖田 勇帆</span>
+          <span class="sns-handle"><a href="https://twitter.com/OkitaYuho" target="_blank">@OkitaYuho</a></span>
+        </div>
+        <div class="sns-item">
+          <span class="sns-name">庵本 直矢</span>
+          <span class="sns-handle"><a href="https://twitter.com/naoya_758" target="_blank">@naoya_758</a></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div><div class="footer-brand">野心会</div><div class="footer-tagline">Yashinkai — Community of Ambition</div></div>
+    <div class="footer-nav">
+      <a href="index.html">Top</a>
+      <a href="members.html">Members</a>
+      <a href="activities.html">Activities</a>
+      <a href="join.html">Join</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </div>
+  <div class="footer-copy">&copy; 2026 野心会 All Rights Reserved.</div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver(e => e.forEach(x => { if(x.isIntersecting) x.target.classList.add('visible'); }), {threshold:0.1});
+  document.querySelectorAll('.fade-in').forEach(el => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      el.classList.add('visible');
+    } else {
+      observer.observe(el);
+    }
+  });
+  function toggleMenu(){ document.getElementById('mobileMenu').classList.toggle('open'); document.getElementById('hamburger').classList.toggle('open'); }
+  function closeMenu(){ document.getElementById('mobileMenu').classList.remove('open'); document.getElementById('hamburger').classList.remove('open'); }
+  function submitForm(e){ e.preventDefault(); document.getElementById('form-success').style.display='block'; e.target.reset(); }
+  const stampImages = ['判子/赤コンタクト.png', '判子/黄コンタクト.png', '判子/青コンタクト.png'];
+  document.getElementById('stamp-img').style.backgroundImage = `url('${stampImages[Math.floor(Math.random() * stampImages.length)]}')`;
+</script>
+</body>
+</html>
